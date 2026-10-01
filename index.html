@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <script>/* gate-bootstrap: capture an early login submit before the remote gate wires up, so the first click is never lost */
+  (function(){function h(e){var f=e.target;if(f&&f.id==='gate-form'&&!window.MembershipGate){e.preventDefault();e.stopImmediatePropagation();window.__gateEarlySubmit=true;}}window.addEventListener('submit',h,true);window.__gateBootstrapDisarm=function(){window.removeEventListener('submit',h,true);};})();</script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Feed IA — Maestros da IA</title>
+  <meta name="description" content="Planeje o feed visual do Instagram: a IA monta a grade do mês (pilares, formatos e ganchos) e você exporta o mosaico pronto para apresentar ao cliente.">
+  <link rel="stylesheet" href="styles.css">
+  <link rel="preconnect" href="https://gate.maestrosdaia.com">
+  <link rel="preload" href="https://gate.maestrosdaia.com/v1/membership-gate.js" as="script">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%2315161a'/%3E%3Crect x='6' y='6' width='6' height='6' rx='1.4' fill='%23d7a54a'/%3E%3Crect x='13' y='6' width='6' height='6' rx='1.4' fill='%234e86c8'/%3E%3Crect x='20' y='6' width='6' height='6' rx='1.4' fill='%2369b08a'/%3E%3Crect x='6' y='13' width='6' height='6' rx='1.4' fill='%234e86c8'/%3E%3Crect x='13' y='13' width='6' height='6' rx='1.4' fill='%23d7a54a'/%3E%3Crect x='20' y='13' width='6' height='6' rx='1.4' fill='%23c8654e'/%3E%3Crect x='6' y='20' width='6' height='6' rx='1.4' fill='%2369b08a'/%3E%3Crect x='13' y='20' width='6' height='6' rx='1.4' fill='%23c8654e'/%3E%3Crect x='20' y='20' width='6' height='6' rx='1.4' fill='%23d7a54a'/%3E%3C/svg%3E">
+</head>
+<body>
+  <div class="bg-gradient"></div>
+
+  <!-- MEMBERSHIP GATE -->
+  <div id="gate-screen" class="screen active">
+    <div class="gate-container">
+      <div class="gate-header">
+        <h1 class="gradient-text">Feed IA</h1>
+        <p class="subtitle">Planeje o feed visual do Instagram do mês inteiro — e exporte o mosaico pronto para apresentar.</p>
+        <p class="community-badge">Exclusivo para membros da Comunidade Maestros da IA</p>
+      </div>
+
+      <form id="gate-form" class="gate-form">
+        <div class="form-group">
+          <label for="gate-email">Seu e-mail cadastrado</label>
+          <input type="email" id="gate-email" placeholder="seu@email.com" autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label for="gate-phone">Seu WhatsApp (com DDD)</label>
+          <input type="tel" id="gate-phone" placeholder="11999999999" autocomplete="tel">
+        </div>
+        <button type="submit" id="gate-submit" class="btn-primary">
+          <span class="btn-text">Verificar acesso</span>
+          <span class="btn-loading" style="display:none;">Verificando...</span>
+        </button>
+        <p id="gate-error" class="error-message" style="display:none;"></p>
+      </form>
+
+      <p class="gate-footer">Ainda não é membro? <a href="https://comunidade.maestrosdaia.com" target="_blank" rel="noopener noreferrer">Conheça a Comunidade Maestros da IA</a></p>
+    </div>
+  </div>
+
+  <!-- API KEY SETUP -->
+  <div id="key-screen" class="screen">
+    <div class="key-container">
+      <h2>Configure sua chave de IA</h2>
+      <p class="subtitle">Sua chave fica salva apenas no seu navegador. Nunca é enviada para nossos servidores. Use a sua própria chave da OpenRouter — um único acesso a Claude, GPT, Gemini, DeepSeek e mais.</p>
+
+      <div id="key-inputs" class="key-inputs">
+        <!-- populated by api-key-manager.js -->
+      </div>
+
+      <div class="key-field">
+        <label for="key-model-select">Modelo de IA (opcional — pode trocar depois)</label>
+        <select id="key-model-select"></select>
+      </div>
+
+      <div class="key-actions">
+        <button id="key-continue" class="btn-primary" disabled>Entrar no estúdio</button>
+        <button id="key-skip" class="btn-secondary">Pular por enquanto</button>
+      </div>
+
+      <details class="key-info">
+        <summary>Como consigo uma chave de API?</summary>
+        <div class="key-info-content">
+          <p><strong>OpenRouter (recomendado):</strong> acesse <code>openrouter.ai/keys</code>, crie uma chave e adicione créditos. Uma chave só já alcança Claude, GPT, Gemini, DeepSeek e os modelos em alta.</p>
+          <p>A chave é sua e roda direto do seu navegador — a Feed IA nunca vê nem guarda sua chave.</p>
+        </div>
+      </details>
+    </div>
+  </div>
+
+  <!-- MAIN APPLICATION -->
+  <div id="app-screen" class="screen">
+    <header class="app-header">
+      <div class="header-left">
+        <h1 class="app-title">Feed IA</h1>
+      </div>
+      <div class="header-right">
+        <a href="about.html" class="btn-icon" title="Sobre esta ferramenta" aria-label="Sobre">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        </a>
+        <button id="manage-keys-btn" class="btn-icon" title="Gerenciar chaves de API">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
+        </button>
+        <button id="logout-btn" class="btn-icon" title="Sair">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="app-main">
+      <div class="studio">
+        <!-- LEFT: brief form -->
+        <section class="panel" aria-label="Briefing do feed">
+          <div class="panel-head">
+            <h2>Briefing do mês</h2>
+            <span class="placard-label">Curadoria</span>
+          </div>
+          <p class="panel-sub">Preencha o essencial. A IA monta a grade equilibrando pilares e formatos.</p>
+
+          <div id="no-key-warn" class="no-key-warn">
+            Adicione sua chave da OpenRouter para gerar. <a href="#" id="open-keys-link">Configurar chave</a>
+          </div>
+
+          <div class="form-row">
+            <label for="f-marca">Marca / perfil</label>
+            <input type="text" id="f-marca" placeholder="@padariapaoecia ou Padaria Pão & Cia">
+          </div>
+          <div class="form-row">
+            <label for="f-nicho">Nicho / segmento</label>
+            <input type="text" id="f-nicho" placeholder="Padaria artesanal de bairro">
+          </div>
+          <div class="form-row">
+            <label for="f-tema">Tema / foco do mês <span style="color:var(--ink-3);font-weight:400">(opcional)</span></label>
+            <input type="text" id="f-tema" placeholder="Ex.: lançamento da linha de pães fermentados">
+          </div>
+
+          <div class="grid-2">
+            <div class="form-row">
+              <label for="f-qtd">Nº de posts</label>
+              <select id="f-qtd">
+                <option value="9">9 (grade 3×3)</option>
+                <option value="12" selected>12 (3×4)</option>
+                <option value="15">15 (3×5)</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="f-objetivo">Objetivo do mês</label>
+              <select id="f-objetivo">
+                <option value="crescer">Crescer audiência</option>
+                <option value="engajar" selected>Engajar a audiência</option>
+                <option value="vender">Vender / converter</option>
+                <option value="autoridade">Construir autoridade</option>
+                <option value="lancamento">Lançamento</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="f-pilares">Pilares de conteúdo <span style="color:var(--ink-3);font-weight:400">(opcional — 1 por linha)</span></label>
+            <textarea id="f-pilares" placeholder="Bastidores&#10;Educação / dicas&#10;Prova social&#10;Ofertas"></textarea>
+            <p class="field-hint">Deixe em branco e a IA sugere os pilares certos para o seu nicho.</p>
+          </div>
+
+          <div class="grid-2">
+            <div class="form-row">
+              <label for="f-tom">Tom de voz</label>
+              <select id="f-tom">
+                <option value="profissional">Profissional</option>
+                <option value="descontraido" selected>Descontraído</option>
+                <option value="inspirador">Inspirador</option>
+                <option value="tecnico">Técnico / especialista</option>
+                <option value="divertido">Divertido</option>
+              </select>
+            </div>
+            <div class="form-row">
+              <label for="f-model-wrap">Modelo de IA</label>
+              <div class="model-pick"><select id="model-select"></select></div>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label>Cores da marca <span style="color:var(--ink-3);font-weight:400">(opcional — moldura do mosaico)</span></label>
+            <div class="color-row">
+              <input type="color" id="f-cor1" value="#d7a54a" aria-label="Cor principal da marca">
+              <input type="color" id="f-cor2" value="#4e86c8" aria-label="Cor secundária da marca">
+              <span class="swatch-name">Enquadra e tinge a grade</span>
+            </div>
+          </div>
+
+          <div class="form-row">
+            <label for="f-obs">Observações <span style="color:var(--ink-3);font-weight:400">(opcional)</span></label>
+            <textarea id="f-obs" placeholder="Ex.: evitar falar de preço; priorizar Reels; datas comemorativas do mês…"></textarea>
+          </div>
+
+          <div class="gen-actions">
+            <button id="btn-generate" class="btn-primary">
+              <span class="btn-text">Montar a grade</span>
+              <span class="btn-loading" style="display:none;">Montando…</span>
+            </button>
+          </div>
+          <div class="mini-actions">
+            <button id="btn-example" class="link-btn">Preencher exemplo</button>
+            <button id="btn-clear" class="link-btn">Limpar</button>
+          </div>
+        </section>
+
+        <!-- RIGHT: stage -->
+        <section class="stage" aria-label="Grade do feed">
+          <div id="stage-empty" class="stage-empty">
+            <div class="empty-grid"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></div>
+            <h3>Sua grade aparece aqui</h3>
+            <p>Preencha o briefing à esquerda e clique em <strong>Montar a grade</strong>. A IA planeja cada post e desenha o mosaico do feed — pronto para exportar e apresentar.</p>
+          </div>
+
+          <div id="stage-loading" class="stage-loading" hidden>
+            <div class="spot"></div>
+            <p id="loading-mono" class="loading-mono">montando a grade…</p>
+          </div>
+
+          <div id="stage-toolbar" class="stage-toolbar" hidden>
+            <div>
+              <h3 id="tb-title" class="tb-title">Grade do feed</h3>
+              <span id="tb-code" class="tb-code"></span>
+            </div>
+            <div class="tb-spacer"></div>
+            <div class="tabs">
+              <button id="tab-grade" class="tab-btn active">Grade</button>
+              <button id="tab-brief" class="tab-btn">Briefing</button>
+            </div>
+            <div class="tb-exports">
+              <button id="btn-png" class="btn-secondary" title="Baixar o mosaico em PNG">PNG</button>
+              <button id="btn-html" class="btn-secondary" title="Baixar o plano em HTML">HTML</button>
+              <button id="btn-copy" class="btn-secondary" title="Copiar o plano em texto">Copiar</button>
+            </div>
+          </div>
+
+          <div id="view-grade" hidden></div>
+          <div id="view-brief" hidden></div>
+        </section>
+      </div>
+    </main>
+
+    <footer class="app-footer">
+      <p>Feito com carinho para a comunidade <strong>Maestros da IA</strong></p>
+      <p class="footer-links">
+        <a href="about.html">Sobre</a>
+        <span class="footer-sep">·</span>
+        <a href="privacy-policy.html" target="_blank" rel="noopener noreferrer">Política de Privacidade</a>
+        <span class="footer-sep">·</span>
+        <a href="data-deletion.html" target="_blank" rel="noopener noreferrer">Solicitar Exclusão de Dados</a>
+      </p>
+    </footer>
+  </div>
+
+  <!-- API Key Manager Modal -->
+  <div id="key-modal" class="modal" style="display:none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3>Gerenciar chaves de API</h3>
+        <button id="modal-close" class="btn-icon">&times;</button>
+      </div>
+      <div id="modal-key-inputs" class="key-inputs"></div>
+      <div class="key-field">
+        <label for="model-select-modal">Modelo de IA</label>
+        <select id="model-select-modal"></select>
+      </div>
+      <div class="modal-actions">
+        <button id="modal-save" class="btn-primary">Salvar</button>
+        <button id="modal-clear" class="btn-danger">Limpar todas as chaves</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="config.js"></script>
+  <script src="kill-switch.js"></script>
+  <script src="rate-limiter.js"></script>
+  <script src="https://gate.maestrosdaia.com/v1/membership-gate.js"></script>
+  <script src="api-key-manager.js"></script>
+  <script src="feedback-widget.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
