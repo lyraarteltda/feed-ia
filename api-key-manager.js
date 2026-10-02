@@ -167,6 +167,18 @@ const ApiKeyManager = (function() {
   function setModel(modelId) {
     try { if (modelId) localStorage.setItem(MODEL_STORAGE_KEY, modelId); }
     catch { /* localStorage unavailable */ }
+    // COR-055: keep EVERY already-rendered model picker in sync. Generation reads
+    // getModel() (localStorage), so a picker left showing an old value (e.g. the
+    // studio #model-select after the model is changed in the Gerenciar-chaves modal
+    // or on the key screen) would display a model that is NOT the one actually used
+    // — a "control doesn't match behaviour" UX bug (COR-041/051 family). Setting
+    // .value programmatically does not re-fire 'change', so there is no loop.
+    if (modelId) {
+      ['model-select', 'key-model-select', 'model-select-modal'].forEach(function(id) {
+        var s = document.getElementById(id);
+        if (s && s.options && s.options.length && s.value !== modelId) s.value = modelId;
+      });
+    }
   }
 
   // Populate a <select> with provider-grouped <optgroup>s.
